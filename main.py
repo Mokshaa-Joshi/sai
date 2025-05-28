@@ -62,15 +62,15 @@ def query_vectors(query):
         return "Sorry, no relevant information was found in the documents."
 
 # ---------------- UI ----------------
-st.set_page_config(page_title="SAI ChatBot", page_icon="🤖")
-st.title("🏛️ Sports Authority of India - Q&A ChatBot")
+st.set_page_config(page_title="SAI ChatBot")
+st.title("Sports Authority of India - Q&A ChatBot")
 
 query = st.text_input("Ask a question about the Sports Authority of India documents:")
 
 if st.button("Get Answer"):
     if query:
         answer = query_vectors(query)
-        st.markdown("### 📋 Answer")
+        st.markdown("###  Answer")
         st.write(answer)
     else:
         st.warning("Please enter a question.")
