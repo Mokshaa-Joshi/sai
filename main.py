@@ -19,16 +19,18 @@ openai.api_key = OPENAI_API_KEY
 
 # Helper: Query Pinecone for relevant chunks and generate an answer
 def query_vectors(query):
-    vector = openai.Embedding.create(
-        input=[query],
-        model="text-embedding-3-small"
-    ).data[0].embedding
+    # Get embedding vector for query
+    response = openai.embeddings.create(
+        model="text-embedding-3-small",
+        input=query
+    )
+    vector = response.data[0].embedding
 
+    # Query Pinecone index (searching all PDFs without filter)
     results = index.query(
         vector=vector,
         top_k=5,
         include_metadata=True
-        # Removed filter to search all PDFs
     )
 
     if results["matches"]:
@@ -41,14 +43,21 @@ def query_vectors(query):
             f"Question: {query}"
         )
 
-        response = openai.ChatCompletion.create(
+        # Use new chat completion syntax
+        chat_response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are an AI assistant that provides helpful and accurate answers using official documents from the Sports Authority of India."},
-                {"role": "user", "content": prompt}
+                {
+                    "role": "system",
+                    "content": "You are an AI assistant that provides helpful and accurate answers using official documents from the Sports Authority of India."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
             ]
         )
-        return response.choices[0].message.content.strip()
+        return chat_response.choices[0].message.content.strip()
     else:
         return "Sorry, no relevant information was found in the documents."
 
